@@ -152,7 +152,7 @@ namespace Hamster.States {
       }
       CommonData.mainCamera.mode = CameraController.CameraMode.Menu;
       Utilities.HideDuringGameplay.OnGameplayStateChange(false);
-      Time.timeScale = 0.0f;
+      //Time.timeScale = 0.0f;
       Screen.sleepTimeout = SleepTimeout.SystemSetting;
       DestroyReplayAnimator();
 
@@ -168,7 +168,7 @@ namespace Hamster.States {
       if (CommonData.vrPointer != null) {
         CommonData.vrPointer.SetActive(true);
       }
-      Time.timeScale = 0.0f;
+      //Time.timeScale = 0.0f;
       CommonData.mainCamera.mode = CameraController.CameraMode.Menu;
       Screen.sleepTimeout = SleepTimeout.NeverSleep;
     }

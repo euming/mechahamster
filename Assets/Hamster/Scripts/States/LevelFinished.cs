@@ -103,22 +103,24 @@ namespace Hamster.States {
 
     public override void Suspend() {
       HideUI();
-      Time.timeScale = 0.0f;
+//      Time.timeScale = 0.0f;
     }
 
     public override StateExitValue Cleanup() {
       CommonData.gameWorld.ResetMap();
       DestroyUI();
-      Time.timeScale = 0.0f;
+//      Time.timeScale = 0.0f;
       return null;
     }
 
     public override void Update() {
       float elapsedTime = Time.realtimeSinceStartup - StartTime;
       if (elapsedTime < SlowdownTotalTime) {
-        Time.timeScale = Mathf.Lerp(1.0f, 0.0f, elapsedTime / SlowdownTotalTime);
+                //  remove this since it may cause strange bugs with networking.
+                //  Time.timeScale = Mathf.Lerp(1.0f, 0.0f, elapsedTime / SlowdownTotalTime);
+                Time.timeScale = 1.0f;
       } else {
-        Time.timeScale = 0.0f;
+        //Time.timeScale = 0.0f;
       }
     }
 

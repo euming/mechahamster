@@ -25,7 +25,7 @@ namespace Hamster
         Camera mycam;
         Transform mycamParentXform;
         Vector3 kYaxis = new Vector3(0, 1, 0);
-        const float kExpectedFrameRate = 15.0f;     //  lowest expected frame rate in frames per second.
+        const float kExpectedFrameRate = 30.0f;     //  lowest expected frame rate in frames per second.
         const float kTimeScale = 1.0f / kExpectedFrameRate;  //  for frame rate independent 
         const float kForceFudgeFactor = 0.4f; //
         const float kPositionDelta = 0.15f;   //  fudge factor
@@ -210,9 +210,11 @@ namespace Hamster
                 float elapsedTime = Time.deltaTime; //  time since last frame.
                 Vector2 input = inputController.GetInputVector();   //  kKeyVelocity
                 input *= kTimeScale;    //  just a fudge factor to make it feel right.
-                if (elapsedTime <= 0.01f)   //  guard vs. divide by zero or negative nonsense.
+                if (elapsedTime <= 0.10f)   //  guard vs. divide by zero or negative nonsense.
                 {
-                    input = new Vector2(0, 0);
+                    //  input = new Vector2(0, 0);  //  NOPE! even if we have a very tiny timeslice, we still need to add force to our ball!
+                    input /= 0.10f;
+
                 }
                 else
                 {

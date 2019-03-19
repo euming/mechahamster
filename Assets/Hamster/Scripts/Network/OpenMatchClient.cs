@@ -29,21 +29,14 @@ namespace Hamster
         {
             get { return port; }
         }
-         
+
         private string GetPlayerUniqueID()
         {
-            if (Application.platform != RuntimePlatform.Android)
-            {
-                // Unity's device ID does not differentiate when multiple clients are run on the same device.
-                // For the sake of testing, we add a timestamp if we're not on Android so we can run multiple PC clients.
+            // Unity's device ID does not differentiate when multiple clients are run on the same device.
+            // For the sake of testing, we add a timestamp if we're not on Android so we can run multiple PC clients.
 
-                Int32 unixTimestamp = (Int32)(DateTime.UtcNow.Subtract(new DateTime(1970, 1, 1))).TotalSeconds;
-                return UnityEngine.Application.platform.ToString().ToLower() + "-" + SystemInfo.deviceUniqueIdentifier + "-" + unixTimestamp;
-            }
-            else
-            {
-               return UnityEngine.Application.platform.ToString().ToLower() + "-" + SystemInfo.deviceUniqueIdentifier;
-            }
+            Int32 unixTimestamp = (Int32)(DateTime.UtcNow.Subtract(new DateTime(1970, 1, 1))).TotalSeconds;
+            return UnityEngine.Application.platform.ToString().ToLower() + "-" + SystemInfo.deviceUniqueIdentifier + "-" + unixTimestamp;
         }
 
         private async Task<string> WaitForMatchResults(AsyncServerStreamingCall<Messages.Player> stream)

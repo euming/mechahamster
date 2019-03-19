@@ -25,7 +25,7 @@ namespace Hamster
         Camera mycam;
         Transform mycamParentXform;
         Vector3 kYaxis = new Vector3(0, 1, 0);
-        const float kExpectedFrameRate = 30.0f;     //  lowest expected frame rate in frames per second.
+        const float kExpectedFrameRate = 12.0f;     //  lowest expected frame rate in frames per second.
         const float kTimeScale = 1.0f / kExpectedFrameRate;  //  for frame rate independent 
         const float kForceFudgeFactor = 0.4f; //
         const float kPositionDelta = 0.15f;   //  fudge factor

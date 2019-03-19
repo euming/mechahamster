@@ -39,10 +39,13 @@ namespace Hamster.States
             NetworkClient.allClients[0].Send((short)customNetwork.CustomNetworkManager.hamsterMsgType.hmsg_clientOpenMatchAck, readyMsg);
             disconnectTime = Time.realtimeSinceStartup + disconnectAfterTime;
             //  DisconnectPreviousConnection();   //  we do not want to do this until after we've sent an ack to our server. so let's wait for a little bit for the hmsg_serverOpenMatchAckBack from the server!
+            GetPointers();
+            hud.showClientDebugInfoMessage("Client SendACKtoServer");
         }
 
         void OpenMatchRequest()
         {
+            hud.showClientDebugInfoMessage("OpenMatchRequest.bOpenMatchWaiting=" + bOpenMatchWaiting.ToString());
             if (bOpenMatchWaiting) return;  //  already trying to make a match. Give up on future attempts
 
             Debug.LogWarning("Attempting to connect to Open Match!");
@@ -52,7 +55,7 @@ namespace Hamster.States
             // there is a server-side filter which can create a match with a new value.
             string modeCheckJSON = @"{""mode"": {""battleroyale"": 1}";
 
-            if (openMatch != null && openMatch.Connect("35.236.24.200", modeCheckJSON))
+            if (openMatch != null && openMatch.Connect("35.236.24.200", modeCheckJSON)) //  only call this once!
             {
                 Debug.Log("Match request sent!");
                 SendACKtoServer();
@@ -61,7 +64,9 @@ namespace Hamster.States
             else
             {
                 string detail = openMatch != null ? openMatch.Address : "null";
-                Debug.LogWarning("Could not connect to openMatch: " + detail);
+                string msg = "Could not connect to openMatch: " + detail;
+                Debug.LogWarning(msg);
+                hud.showClientDebugInfoMessage(msg);
             }
         }
 
@@ -98,8 +103,10 @@ namespace Hamster.States
         }
         override public void Initialize()
         {
+            bOpenMatchWaiting = false;
             Debug.Log("ClientOpenMatchStart.Initialize");
             GetPointers();
+            DisconnectPreviousConnection();
             OpenMatchRequest();
         }
         override public void OnGUI()
@@ -107,10 +114,13 @@ namespace Hamster.States
             //Debug.LogWarning("ClientOpenMatchStart.OnGUI");
             if (hud != null)
             {
+                string extraMsg = "\nOMStart: openMatch ip=" + openMatch.Address + ", port=" + openMatch.Port.ToString();
+                if (openMatch == null)
+                {
+                    extraMsg = "\nOpenMatch==null";
+                }
                 //hud.scaledTextBox("ClientOpenMatchStart.curNumPlayers=" + curNumPlayers.ToString());
-                hud.scaledTextBox("ClientOpenMatchStart ip=" + manager.networkAddress + ", port=" + manager.networkPort.ToString());
-                if (openMatch != null)
-                    hud.scaledTextBox("OMStart: openMatch ip=" + openMatch.Address + ", port=" + openMatch.Port.ToString());
+                hud.scaledTextBox("ClientOpenMatchStart manager.addr=" + manager.networkAddress + ":" + manager.networkPort.ToString() + extraMsg);
             }
         }
 

@@ -9,6 +9,7 @@ namespace Hamster.States
     {
         public NetworkManager manager;
         public CustomNetworkManagerHUD hud;
+        private OpenMatchClient openMatch;
         JsonStartupConfig config;
         string lobbyAddress;
         int lobbyPort;
@@ -39,7 +40,20 @@ namespace Hamster.States
             Debug.LogWarning("ClientReturnToLobby.Initialize\n");
             GetPointers();
             if (hud != null)
+            {
                 hud.ReadConfig();
+                if (openMatch == null)
+                {
+                    if (hud != null)
+                    {
+                        openMatch = hud.GetComponent<OpenMatchClient>();    //  this is probably not the best place for the OpenMatch component, but I don't care. It's where it is now. Change it later if it causes problems.
+                        if (openMatch != null)
+                            openMatch.Disconnect();
+                    }
+                }
+
+            }
+            
             Shutdown();
             disconnectTime = Time.realtimeSinceStartup;
         }

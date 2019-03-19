@@ -9,7 +9,7 @@ namespace customNetwork
 {
     public class CustomNetworkManager : NetworkManager
     {
-        const bool bIgnoreOpenMatchServerRequest = false;   //  minghack: ignore request to go to OpenMatch so we can test finish match states
+        bool bIgnoreOpenMatchServerRequest = false;   //  minghack: ignore request to go to OpenMatch so we can test finish match states
         const int kLastUnityMsgType = 255;   //  Use a number after Unity's own message types for our own message types. Note: it's not actually 255. But we're leaving room for Unity to grow its own enum list.
         const int kMaxShort = 32767;
         public enum hamsterMsgType
@@ -198,7 +198,7 @@ namespace customNetwork
                 ClientScene.Ready(conn);
             }
             CustomNetworkPlayer.CreatePlayerClient(localControllerId);
-            //        ClientScene.AddPlayer(0);
+            //  ClientScene.AddPlayer(0);
 
         }
         //
@@ -850,6 +850,11 @@ namespace customNetwork
             string finishTime = strMsg.value;
             Debug.LogWarning("Client received Server finished Time=" + finishTime);
             //MultiplayerGame.instance.ClientSwapMultiPlayerState<Hamster.States.ClientFinishedRace>(); //  make our client go into the OpenMatch server state!
+        }
+
+        public void IgnoreOpenMatchRequest(bool bIgnore)
+        {
+            bIgnoreOpenMatchServerRequest = bIgnore;
         }
         //  the server has sent the server state to us.
         void OnClientServerState(NetworkMessage netMsg)

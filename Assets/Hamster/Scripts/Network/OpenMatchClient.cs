@@ -131,7 +131,7 @@ namespace Hamster
             client = new Frontend.FrontendClient(channel);
 
             // Disconnect the player (and clean up work variables) in the event one was already connected.
-            Disconnect();
+            //Disconnect();
 
             player = new Messages.Player();
             player.Id = GetPlayerUniqueID();

@@ -1,0 +1,23 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mecha-load-test
+  labels:
+    app: mecha-load-test
+    component: loadtest
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mecha-load-test
+      component: loadtest
+  template:
+    metadata:
+      labels:
+        app: mecha-load-test
+        component: loadtest
+    spec:
+      containers:
+      - name: mecha-load-test
+        image: gcr.io/mechahamster/mecha-load-test:latest
+        imagePullPolicy: Always

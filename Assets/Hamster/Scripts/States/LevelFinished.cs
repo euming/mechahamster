@@ -16,6 +16,7 @@ using UnityEngine;
 using System;
 using System.Collections.Generic;
 using Firebase.Leaderboard;
+using UnityEngine.Networking;
 
 namespace Hamster.States {
   class LevelFinished : BaseState {
@@ -68,6 +69,8 @@ namespace Hamster.States {
         !CommonData.gameWorld.HasPendingEdits && CommonData.ShowInternetMenus());
       dialogComponent.ElapsedTimeText.text = string.Format(StringConstants.FinishedTimeText,
           Utilities.StringHelper.FormatTime(ElapsedGameTime));
+      dialogComponent.ElapsedTimeText.verticalOverflow = VerticalWrapMode.Overflow;
+      dialogComponent.ElapsedTimeText.supportRichText = true;
 
       if (mode == Gameplay.GameplayMode.Editor) {
         // A few minor differences in edit mode:
@@ -113,6 +116,8 @@ namespace Hamster.States {
       return null;
     }
 
+    public static string ElapsedTimeTextStringHack = string.Empty; // stfu
+
     public override void Update() {
       float elapsedTime = Time.realtimeSinceStartup - StartTime;
       if (elapsedTime < SlowdownTotalTime) {
@@ -122,6 +127,9 @@ namespace Hamster.States {
       } else {
         //Time.timeScale = 0.0f;
       }
+
+      // stfu
+      dialogComponent.ElapsedTimeText.text = ElapsedTimeTextStringHack;
     }
 
     public override void HandleUIEvent(GameObject source, object eventData) {
@@ -129,6 +137,7 @@ namespace Hamster.States {
         CommonData.mainGame.SelectAndPlayMusic(CommonData.prefabs.menuMusic, true);
         manager.PopState();
       } else if (source == dialogComponent.RetryButton.gameObject) {
+                ElapsedTimeTextStringHack = String.Empty;
                 MultiplayerGame.instance.ClientEnterMultiPlayerState<Hamster.States.ClientReturnToLobby>();
 
                 //manager.SwapState(new Gameplay(mode));

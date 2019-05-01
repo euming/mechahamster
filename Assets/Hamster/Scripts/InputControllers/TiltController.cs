@@ -42,6 +42,7 @@ namespace Hamster.InputControllers {
     }
 
     public override Vector2 GetInputVector() {
+      CheckTripleTapFlip();
       Vector3 inputVector = Input.acceleration.normalized;
       // For our down-vector, (and the self-adjustments) we only care
       // about the Y and Z axis.  We don't self-center for the X axis,
@@ -64,6 +65,23 @@ namespace Hamster.InputControllers {
 
       Vector3 tiltInput = translatedInput * TiltVelocity;
       return new Vector3(tiltInput.x, -tiltInput.z);
+    }
+
+    public void CheckTripleTapFlip()
+    {
+      int fingerCount = 0;
+      Touch[] touches = Input.touches;
+      foreach (Touch touch in touches)
+      {
+        if (touch.phase != TouchPhase.Ended && touch.phase != TouchPhase.Canceled)
+        {
+          fingerCount++;
+        }
+      }
+      if (fingerCount >= 3)
+      {
+        Screen.orientation = Screen.orientation == ScreenOrientation.LandscapeLeft ? ScreenOrientation.LandscapeRight : ScreenOrientation.LandscapeLeft;
+      }
     }
   }
 }

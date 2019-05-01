@@ -32,7 +32,7 @@ namespace Hamster.States
         //  we are ready to go to OpenMatch. So, our LOBBY server can stop spamming us now, please.
         void SendACKtoServer()
         {
-            Debug.LogWarning("ClientOpenMatchStart.SendACKtoServer=(#" + NetworkClient.allClients[0].connection.connectionId.ToString() 
+            Debug.Log("ClientOpenMatchStart.SendACKtoServer=(#" + NetworkClient.allClients[0].connection.connectionId.ToString() 
                 + "/" + NetworkClient.allClients.Count.ToString() + ")\n");
             
             MessageBase readyMsg = new UnityEngine.Networking.NetworkSystem.IntegerMessage(NetworkClient.allClients[0].connection.connectionId);    //  send my connection id to my server to tell the server that I'm ready to run OpenMatch, so you can stop reminding me to go to openmatch.
@@ -48,7 +48,7 @@ namespace Hamster.States
             hud.showClientDebugInfoMessage("OpenMatchRequest.bOpenMatchWaiting=" + bOpenMatchWaiting.ToString());
             if (bOpenMatchWaiting) return;  //  already trying to make a match. Give up on future attempts
 
-            Debug.LogWarning("Attempting to connect to Open Match!");
+            Debug.Log("Attempting to connect to Open Match!");
 
 
             // This string is what a match is filtered on. Don't change it unless

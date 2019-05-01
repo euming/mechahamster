@@ -332,7 +332,7 @@ namespace customNetwork
          */
         void OnServerAddPlayerInternal(GameObject prefabToInstantiate, NetworkConnection conn, short playerControllerId)
         {
-            Debug.Log("CustomNetworkManager.OnServerAddPlayerInternal: " + conn.ToString() + ", plrControllerId="+playerControllerId.ToString());
+            DebugOutput("CustomNetworkManager.OnServerAddPlayerInternal: " + conn.ToString() + ", plrControllerId="+playerControllerId.ToString());
             /*
             if (m_PlayerPrefab == null)
             {
@@ -462,7 +462,7 @@ namespace customNetwork
             }
             if (!client_connections.Contains(conn))
             {
-                Debug.LogFormat("CreateClientConnections: Adding client connection: {0}", conn);
+                DebugOutput("CreateClientConnections: Adding client connection: {0}", conn);
                 client_connections.Add(conn);
             }
         }
@@ -511,7 +511,7 @@ namespace customNetwork
                 }
             }
             base.OnServerDisconnect(conn);
-            Debug.LogError("CustomNetworkManager.OnServerDisconnect: connId=" + conn.connectionId.ToString() + "\n");
+            DebugOutput("CustomNetworkManager.OnServerDisconnect: connId=" + conn.connectionId.ToString() + "\n");
             if (this.client_connections != null && this.client_connections.Contains(conn)) {
                 DestroyConnectionsPlayerControllers(conn);
                 this.client_connections.Remove(conn);
@@ -532,7 +532,7 @@ namespace customNetwork
             //this.StopHost();
             //this.StopServer();
 
-            Debug.Log("Application ending after " + Time.time + " seconds");
+            DebugOutput("Application ending after " + Time.time + " seconds");
             for (int ii = 0; ii < NetworkClient.allClients.Count; ii++)
             {
                 NetworkClient.allClients[ii].connection.Disconnect();
@@ -563,7 +563,7 @@ namespace customNetwork
         public override void OnServerReady(NetworkConnection conn)
         {
 
-            Debug.LogWarning("OnServerReady: " + conn.ToString()+"\n");
+            DebugOutput("OnServerReady: " + conn.ToString()+"\n");
             SendServerVersion(conn);
             SendServerLevel(conn);
             CreateClientConnections(conn);
@@ -695,7 +695,7 @@ namespace customNetwork
         //   sceneName:
         //     The name of the new Scene.
         public override void OnServerSceneChanged(string sceneName) {
-            Debug.Log("CustomNetworkManager.OnServerSceneChanged. Server scene changed: " + sceneName  + "\n");
+            DebugOutput("CustomNetworkManager.OnServerSceneChanged. Server scene changed: " + sceneName  + "\n");
             if (sceneName == "NetworkMainGameScene")
             {
 
@@ -781,10 +781,10 @@ namespace customNetwork
             UnityEngine.Networking.NetworkSystem.StringMessage strMsg = netMsg.ReadMessage<UnityEngine.Networking.NetworkSystem.StringMessage>();
             serverVersion = strMsg.value;
             string clientVersion = Application.version;
-            Debug.Log("Client received Server version=" + serverVersion);
+            DebugOutput("Client received Server version=" + serverVersion);
             if (serverVersion != clientVersion)
             {
-                Debug.LogError("Server Version=" + serverVersion + " does not match client=" + clientVersion);
+                Debug.LogWarning("Server Version=" + serverVersion + " does not match client=" + clientVersion);
                 bServerVersionDoesntMatch = true;
             }
             else
@@ -801,7 +801,7 @@ namespace customNetwork
         //  tell all clients this message
         public void ServerShout(string msg)
         {
-            Debug.Log("DbgMsg: ServerShout:" + msg);
+            DebugOutput("DbgMsg: ServerShout:" + msg);
             foreach (NetworkConnection conn in client_connections) {
                 ServerSendDebugMessageToClient(msg, conn);
             }
@@ -810,7 +810,7 @@ namespace customNetwork
         //  client handles hmsg_serverDebugInfo
         public void ServerSendDebugMessageToClient(string msg, NetworkConnection conn)
         {
-            Debug.Log("DbgMsg: Server->client(" + conn.connectionId.ToString() + "):"+msg);
+            DebugOutput("DbgMsg: Server->client(" + conn.connectionId.ToString() + "):"+msg);
             MessageBase serverDebugMsgBase = new UnityEngine.Networking.NetworkSystem.StringMessage(msg);
             NetworkServer.SendToClient(conn.connectionId, (short)customNetwork.CustomNetworkManager.hamsterMsgType.hmsg_serverDebugInfo, serverDebugMsgBase);
         }
@@ -820,10 +820,27 @@ namespace customNetwork
         {
             UnityEngine.Networking.NetworkSystem.StringMessage strMsg = netMsg.ReadMessage<UnityEngine.Networking.NetworkSystem.StringMessage>();
             string serverDbg = strMsg.value;
-            Debug.LogError("OnClientRcvServerDebugInfo " + serverDbg);
+            DebugOutput("OnClientRcvServerDebugInfo " + serverDbg);
             if (hud != null)
             {
                 hud.curServerDebugInfo = serverDbg;
+            }
+
+            // stfu
+            if(serverDbg.Contains("Time:"))
+            {
+                string[] splits = serverDbg.Split(' ');
+                if(splits.Length == 6)
+                {
+                    string timeSecs = splits[2];
+                    string place = splits[0].Substring(1,1);
+                    string playerColor = splits[5];
+                    Hamster.States.LevelFinished.ElapsedTimeTextStringHack += string.Format("<color={3}>{0} {1}\t{2}s</color>\r\n", place, playerColor, timeSecs, playerColor.ToLower());
+                }
+                else
+                {
+                    Hamster.States.LevelFinished.ElapsedTimeTextStringHack += serverDbg;
+                }
             }
         }
 
@@ -831,10 +848,10 @@ namespace customNetwork
         //  client gets the message and quits the server to go back to the lobby.
         void OnClientGameOver(NetworkMessage netMsg)
         {
-            Debug.LogError("OnClientGameOver hmsg_serverGameOver recvd");
+            DebugOutput("OnClientGameOver hmsg_serverGameOver recvd");
             UnityEngine.Networking.NetworkSystem.StringMessage strMsg = netMsg.ReadMessage<UnityEngine.Networking.NetworkSystem.StringMessage>();
             string serverState = strMsg.value;
-            Debug.LogError("OnClientFinished hmsg_serverGameOver msg=" + serverState);
+            DebugOutput("OnClientFinished hmsg_serverGameOver msg=" + serverState);
 
             //  quit OpenMatch and return to the "Lobby" which is really the preOpenMatchState.
             //MultiplayerGame.instance.ClientEnterMultiPlayerState<Hamster.States.ClientReturnToLobby>();   //  don't do this anymore. It doesn't work reliably. Let the player hit "Retry" in the "goal" menu.
@@ -845,10 +862,10 @@ namespace customNetwork
         //  handles the hmsg_serverPlayerFinished message from the server.
         void OnClientFinished(NetworkMessage netMsg)
         {
-            Debug.LogError("OnClientFinished hmsg_serverPlayerFinished recvd");
+            DebugOutput("OnClientFinished hmsg_serverPlayerFinished recvd");
             UnityEngine.Networking.NetworkSystem.StringMessage strMsg = netMsg.ReadMessage<UnityEngine.Networking.NetworkSystem.StringMessage>();
             string finishTime = strMsg.value;
-            Debug.LogWarning("Client received Server finished Time=" + finishTime);
+            DebugOutput("Client received Server finished Time=" + finishTime);
             //MultiplayerGame.instance.ClientSwapMultiPlayerState<Hamster.States.ClientFinishedRace>(); //  make our client go into the OpenMatch server state!
         }
 
@@ -862,7 +879,7 @@ namespace customNetwork
 
             UnityEngine.Networking.NetworkSystem.StringMessage strMsg = netMsg.ReadMessage<UnityEngine.Networking.NetworkSystem.StringMessage>();
             string serverState = strMsg.value;
-            Debug.LogWarning("Client received Server state=" + serverState);
+            DebugOutput("Client received Server state=" + serverState);
             if (serverState.Contains("ServerOpenMatchStart"))
             {
                 if (!bIgnoreOpenMatchServerRequest)
@@ -888,7 +905,7 @@ namespace customNetwork
         {
             int clientConnId = netMsg.conn.connectionId;
             int levelIdx = Hamster.CommonData.gameWorld.curLevelIdx;
-            Debug.LogWarning("Client #" + clientConnId.ToString() + " asked Server for level index=" + levelIdx.ToString());
+            DebugOutput("Client #" + clientConnId.ToString() + " asked Server for level index=" + levelIdx.ToString());
             SendServerLevel(netMsg.conn);
         }
         //  server handles hmsg_clientOpenMatchAck
@@ -899,7 +916,7 @@ namespace customNetwork
             
             //int clientConnId = intMsg.value;    //  this client told us the connectionID they *think* they're on. But Unity plays a joke on us. They're different than the server ones for some reason. See this: https://docs.unity3d.com/ScriptReference/Networking.NetworkConnection-connectionId.html
             int clientConnId = netMsg.conn.connectionId;
-            Debug.LogWarning("Server received OpenMatch ACK from client(" + clientConnId.ToString() + ")\n");
+            DebugOutput("Server received OpenMatch ACK from client(" + clientConnId.ToString() + ")\n");
             this.setAck(clientConnId, true);
             //  now that the "lobby" server knows that our client has an OpenMatch addr ready, we can disconnect that client. However, let's not do this because the client will actually disconnect from the newly match OpenMatch server! Yikes!
             //netMsg.conn.Disconnect();
@@ -985,7 +1002,7 @@ namespace customNetwork
                 }
                 else
                 {
-                    Debug.Log("CustomNetworkManager::ReadyUpdate() - Problem: multiPlayerGame={0}", multiPlayerGame);
+                    DebugOutput("CustomNetworkManager::ReadyUpdate() - Problem: multiPlayerGame={0}", multiPlayerGame);
                 }
 
                 yield return new WaitForSeconds(delay);
@@ -1000,7 +1017,7 @@ namespace customNetwork
             }
             else
             {
-                Debug.Log("CustomNetworkManager: StartReadyRoutine: readyRoutine is already allocated.");
+                DebugOutput("CustomNetworkManager: StartReadyRoutine: readyRoutine is already allocated.");
             }
         }
 
@@ -1008,13 +1025,13 @@ namespace customNetwork
         {
             if (readyRoutine != null)
             {
-                Debug.Log("CustomNetworkManager: StopReadyRoutine: Stopping readyRoutine");
+                DebugOutput("CustomNetworkManager: StopReadyRoutine: Stopping readyRoutine");
                 StopCoroutine(readyRoutine);
                 readyRoutine = null;
             }
             else
             {
-                Debug.Log("CustomNetworkManager: StopReadyRoutine: readyRoutine is already de-allocated");
+                DebugOutput("CustomNetworkManager: StopReadyRoutine: readyRoutine is already de-allocated");
             }
         }
     }

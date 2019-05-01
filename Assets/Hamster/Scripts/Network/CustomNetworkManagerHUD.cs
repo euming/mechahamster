@@ -140,7 +140,7 @@ namespace UnityEngine.Networking
                 this.startLevel = config.startupConfig.startingLevel;
                 this.serverAddress = config.startupConfig.serverIP;
                 this.serverPort = config.startupConfig.serverPort;
-                Debug.LogError("ReadConfig addr=" + this.serverAddress);
+                Debug.Log("ReadConfig addr=" + this.serverAddress);
                 if (netMgr != null)
                 {
                     netMgr.networkAddress = this.serverAddress;
@@ -305,10 +305,10 @@ namespace UnityEngine.Networking
             }
             if (NetworkServer.active || NetworkClient.active)
             {
-                if (Input.GetKeyDown(KeyCode.Escape))
-                {
-                    manager.StopHost();
-                }
+                //if (Input.GetKeyDown(KeyCode.Escape))
+                //{
+                //    manager.StopHost();
+                //}
                 if (NetworkClient.active)
                 {
                     if (Input.GetKeyDown(KeyCode.Insert))
@@ -323,10 +323,10 @@ namespace UnityEngine.Networking
             }
             else
             {   //  back button on android quits the app if we're not connected.
-                if (Input.GetKeyDown(KeyCode.Escape))
-                {
-                    Hamster.MainGame.QuitGame();
-                }
+                //if (Input.GetKeyDown(KeyCode.Escape))
+                //{
+                //    Hamster.MainGame.QuitGame();
+                //}
             }
         }
         void DestroyNetworkPlayer()

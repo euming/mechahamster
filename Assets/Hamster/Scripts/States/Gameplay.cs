@@ -213,7 +213,7 @@ namespace Hamster.States {
         backButton.transform.localPosition.y +
         (Screen.height * pixelsToLocalUnits - back_localDimension.y) / 2.0f,
         backButton.transform.localPosition.z);
-
+      backButton.SetActive(false);
       // Move replay button to upper left corner
       GameObject replayButton = dialogComponent.ReplayButton.gameObject;
       if (replayButton) {
@@ -333,10 +333,10 @@ namespace Hamster.States {
 
     // Called once per frame when the state is active.
     public override void FixedUpdate() {
-      if (Input.GetKeyDown(KeyCode.Escape)) {
-        ExitGameplay();
-        return;
-      }
+      //if (Input.GetKeyDown(KeyCode.Escape)) {
+      //  ExitGameplay();
+      //  return;
+      //}
 
       // Change replay state in Main thread
       if (this.bestReplayState == ReplayState.None && isBestReplayAvailable) {
